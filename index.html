@@ -130,6 +130,7 @@ const TOPICS = [
 ];
 const captionEl=document.getElementById('caption'),cardEl=document.getElementById('card'),counterEl=document.getElementById('counter'),genBtn=document.getElementById('gen'),copyBtn=document.getElementById('copy');
 let current="",count=0;
+  if(new URLSearchParams(location.search).get('p')){var _g=5,_p=parseInt(new URLSearchParams(location.search).get('p'),10);if(_p>=1&&_p<=_g){for(var _i=TOPICS.length-1;_i>=0;_i--){if(_i%_g!==(_p-1))TOPICS.splice(_i,1);}var _t=document.querySelector('.brand .tag');if(_t)_t.textContent='set '+_p+' of '+_g;}}
 let seen;
 try { seen = new Set(JSON.parse(localStorage.getItem('usa_seen')||'[]')); } catch(e){ seen = new Set(); }
 function remember(s){ seen.add(s); try { const a=[...seen]; if(a.length>5000)a.splice(0,a.length-5000); localStorage.setItem('usa_seen',JSON.stringify(a)); } catch(e){} }
