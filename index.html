@@ -5,52 +5,97 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>USA Caption Machine</title>
 <style>
-  :root {
-    --ground: #0e0b09;
-    --panel: #17110d;
-    --panel-edge: #2b1f16;
-    --cream: #ece3d4;
-    --muted: #8f8069;
-    --amber: #e7a95a;
-    --amber-deep: #c8802f;
-    --ember: #d8613a;
-    --focus: #f0c079;
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    background:
-      radial-gradient(120% 90% at 50% -10%, #241812 0%, rgba(36,24,18,0) 55%),
-      radial-gradient(90% 70% at 50% 120%, #1c130d 0%, rgba(28,19,13,0) 60%),
-      var(--ground);
-    color: var(--cream);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100dvh; padding: clamp(16px, 4vw, 40px); position: relative; overflow-x: hidden;
-  }
-  body::after {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
-    opacity: 0.05; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  }
-  .wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 18px; position: relative; z-index: 2; }
-  header.brand { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 2px; }
-  .brand h1 { margin: 0; font-size: clamp(20px, 6vw, 26px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1; }
-  .brand h1 .flag { color: var(--amber); }
-  .brand .tag { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-  .card {
-    position: relative; background: linear-gradient(165deg, #1b130d 0%, #140e09 100%);
-    border: 1px solid var(--panel-edge); border-radius: 20px; padding: clamp(22px, 6vw, 34px);
-    min-height: 300px; display: flex; flex-direction: column; justify-content: space-between; gap: 22px;
-    box-shadow: 0 1px 0 rgba(231,169,90,0.06) inset, 0 30px 60px -30px rgba(0,0,0,0.9);
-  }
-  .quotemark { font-family: Georgia, "Times New Roman", serif; font-size: 60px; line-height: 0.4; color: var(--amber-deep); opacity: 0.5; height: 26px; }
-  .caption { font-family: Georgia, "Times New Roman", serif; font-size: clamp(17px, 4.6vw, 20px); line-height: 1.62; color: var(--cream); margin: 0; letter-spacing: 0.002em; }
-  .caption .hash { display: inline; color: var(--amber); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 600; font-size: 0.9em; letter-spacing: 0.02em; }
-  .card.swap .caption { animation: rise 0.5s cubic-bezier(0.2,0.7,0.2,1); }
-  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--panel-edge); padding-top: 16px; }
-  .meta .dot { color: var(--ember); }
-  .controls { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
-  button { font-family: inherit; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 14px; cursor: pointer; border: 1px solid transparent; transition: transform 0.12s ease, background 0.18s ease, color
+  :root { --ground:#0e0b09; --panel-edge:#2b1f16; --cream:#ece3d4; --muted:#8f8069; --amber:#e7a95a; --amber-deep:#c8802f; --ember:#d8613a; --focus:#f0c079; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body { margin:0; background: radial-gradient(120% 90% at 50% -10%, #241812 0%, rgba(36,24,18,0) 55%), radial-gradient(90% 70% at 50% 120%, #1c130d 0%, rgba(28,19,13,0) 60%), var(--ground); color:var(--cream); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100dvh; padding:clamp(16px,4vw,40px); position:relative; overflow-x:hidden; }
+  body::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:50; opacity:0.05; mix-blend-mode:overlay; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+  .wrap { width:100%; max-width:480px; display:flex; flex-direction:column; gap:18px; position:relative; z-index:2; }
+  header.brand { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:0 2px; }
+  .brand h1 { margin:0; font-size:clamp(20px,6vw,26px); font-weight:800; letter-spacing:0.14em; text-transform:uppercase; line-height:1; }
+  .brand h1 .flag { color:var(--amber); }
+  .brand .tag { font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .card { position:relative; background:linear-gradient(165deg,#1b130d 0%,#140e09 100%); border:1px solid var(--panel-edge); border-radius:20px; padding:clamp(22px,6vw,34px); min-height:300px; display:flex; flex-direction:column; justify-content:space-between; gap:22px; box-shadow:0 1px 0 rgba(231,169,90,0.06) inset,0 30px 60px -30px rgba(0,0,0,0.9); }
+  .quotemark { font-family:Georgia,"Times New Roman",serif; font-size:60px; line-height:0.4; color:var(--amber-deep); opacity:0.5; height:26px; }
+  .caption { font-family:Georgia,"Times New Roman",serif; font-size:clamp(17px,4.6vw,20px); line-height:1.62; color:var(--cream); margin:0; }
+  .caption .hash { color:var(--amber); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-weight:600; font-size:0.9em; }
+  .card.swap .caption { animation:rise 0.5s cubic-bezier(0.2,0.7,0.2,1); }
+  @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .meta { display:flex; align-items:center; justify-content:space-between; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); border-top:1px solid var(--panel-edge); padding-top:16px; }
+  .meta .dot { color:var(--ember); }
+  .controls { display:grid; grid-template-columns:1fr auto; gap:12px; }
+  button { font-family:inherit; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; border-radius:14px; cursor:pointer; border:1px solid transparent; transition:transform 0.12s ease,color 0.18s ease,border-color 0.18s ease; font-size:14px; }
+  button:active { transform:translateY(1px) scale(0.995); }
+  .btn-gen { padding:17px 20px; color:#1a1006; background:linear-gradient(180deg,var(--amber) 0%,var(--amber-deep) 100%); box-shadow:0 10px 24px -12px rgba(231,169,90,0.8); }
+  .btn-gen:hover { filter:brightness(1.06); }
+  .btn-copy { padding:17px 20px; color:var(--cream); background:transparent; border-color:var(--panel-edge); display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
+  .btn-copy:hover { border-color:var(--amber-deep); color:var(--amber); }
+  .btn-copy.copied { color:#7cc47c; border-color:#2e5a2e; }
+  footer.note { text-align:center; font-size:11px; letter-spacing:0.1em; color:var(--muted); padding:2px 8px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <h1>USA<span class="flag">·</span>Machine</h1>
+    <span class="tag">one thought at a time</span>
+  </header>
+  <div class="card" id="card">
+    <div class="quotemark">&ldquo;</div>
+    <p class="caption" id="caption"></p>
+    <div class="meta"><span id="counter">#001</span><span><span class="dot">●</span>&nbsp;made with effect</span></div>
+  </div>
+  <div class="controls">
+    <button class="btn-gen" id="gen">New caption</button>
+    <button class="btn-copy" id="copy">Copy</button>
+  </div>
+  <footer class="note">Free · no account. Share the link with your followers.</footer>
+</div>
+<script>
+const CAPTIONS = [
+  "The American shopping mall promised a town square with a roof and air conditioning. Teenagers treated it as a house their parents didn't run. Some of it was commerce dressed up as community. Some of it was the only place a kid could exist unsupervised and indoors. So was the mall the death of Main Street or the last public place America built for people who had nowhere else to go? #america",
+  "MTV played its first video and then spent a decade deciding what a teenager was supposed to want. It sold rebellion in three-minute segments between the commercials. It made stars and it made a generation restless in a way that never fully settled. So did MTV give American kids a culture of their own or just an advertisement shaped like one? #usa",
+  "The American drive-in put a movie screen in a field and called it a night out. Half the cars weren't watching the film and everybody knew it. It was cinema, and it was also the only private space a young couple could afford. So was the drive-in about the movie or about the one place the adults couldn't see into? #america",
+  "Detroit built a car with more engine than anyone needed and sold it as freedom you could park in the driveway. It burned fuel like the future was never coming. It also gave a working man something powerful that was finally his. So was the muscle car American ambition or just noise with a warranty? #usa",
+  "Las Vegas built a city in the desert on the math that the house always wins, and told everyone they might be the exception. The lights were designed so you'd lose track of time and money at the same speed. A few people left with a story. Most left lighter. So was Vegas the American dream sped up or the American dream with the odds finally printed on the wall? #america",
+  "American cereal put a cartoon animal on the box and aimed it at children at eye level in the aisle. The sugar was the product and the mascot was the salesman. It sold breakfast as a toy you were allowed to eat. So did the cereal mascot make mornings fun or just teach a kid to want the box before he wanted the food? #usa",
+  "The American infomercial ran at 3am and sold a gadget no store would stock to an audience that couldn't sleep. It promised your life was one purchase away from fixed. Some of the products worked. Most ended up in a drawer. So was the infomercial solving a problem or manufacturing the ache it claimed to cure? #america",
+  "The American roller rink put a disco ball over a wooden floor and let kids move in a circle for hours. It was exercise disguised as freedom and a social life on eight wheels. It was also one of the last places a town gathered without a screen. So was the roller rink just a fad or the last analog dance floor America built for its kids? #usa",
+  "The video store made every American a curator of one weekend at a time, walking rows of boxes deciding who they wanted to be by Friday night. The late fee was the tax on forgetting. It was retail and it was ritual. So did the video store sell movies or the small serious pleasure of choosing one with your own hands? #america",
+  "American kids bought baseball cards for the gum and kept them for reasons nobody explained. A piece of cardboard became worth more than the player some years. It taught a child markets, loss, and hope in a shoebox. So were baseball cards a hobby or a first lesson in betting on someone else's career? #usa",
+  "The American diner stayed open all night and served the same coffee to the trucker, the cop, and the kid who had nowhere to go at 2am. It wasn't good food so much as reliable food. It was the closest thing a highway had to a living room. So was the diner about the meal or about being the one door in town that never locked? #america",
+  "America built a highway across itself and told its people the answer was somewhere further west. The road trip sold motion as a solution to a feeling. Some found something out there. Most just found the next town. So was the great American road trip a search or a very scenic way to avoid standing still? #usa",
+  "The American mixtape took ninety minutes and a double deck to say something a kid couldn't say out loud. Every song was a sentence and the order was the whole argument. It was a gift that cost only time and nerve. So was the mixtape about the music or about handing someone a feeling you'd deny if they asked? #america",
+  "Saturday morning gave American kids a few hours that belonged entirely to them, and used every commercial break to sell them the toys the show was already about. It was babysitting, marketing, and mythology at once. It also built a whole generation's sense of humor. So were Saturday cartoons a gift to children or the first audience America ever sold to itself? #usa",
+  "America drew streets that all curved the same way and called the result a dream you could mortgage. The lawn was proof you'd made it and a chore that never ended. It gave millions a safe place and a quiet kind of sameness. So was the suburb the American dream delivered or the American dream with the edges filed off? #america",
+  "American fast food promised the same burger in every state and mostly delivered. It fed a country on the move for the price of pocket change. It also taught a nation to eat standing up and call it convenience. So did fast food free the American family from the kitchen or just quietly close it? #usa",
+  "American wrestling told you it was fake and then dared you not to feel it anyway. The hero and the villain were scripted; the crowd's roar was not. It was theater that refused to admit it was theater. So was pro wrestling a con on its audience or the most honest show on television about what America wanted to believe? #america",
+  "Cable gave the American living room fifty channels, then a hundred, then the quiet panic of nothing on. Choice arrived and satisfaction did not come with it. It connected the country to everything and no one to anything in particular. So did cable expand the American mind or just teach it to keep flipping? #usa",
+  "The American state put a jackpot on a paper ticket and sold hope by the dollar at the gas station counter. The odds were printed too small to read, on purpose. For a few days a family got to plan a life they'd never live. So is the lottery a tax on the poor or the cheapest dream America still sells over the counter? #america",
+  "America invented a window you could order dinner from without turning off the engine. It saved everyone four minutes and cost something harder to name. The car became the dining room and the wait became the meal. So was the drive-thru genius convenience or the moment the American family stopped getting out of the car? #usa",
+  "America discovered its own body in the eighties and sold it back a videotape and a leotard. Fitness became a moral position you could rent by mail. It made people healthier and it made them anxious in a brand-new direction. So was the fitness craze about getting strong or about giving Americans one more thing to fail at in the living room? #america",
+  "Wall Street in the eighties made a religion out of more and put it in a suit. The men who won got magazine covers and the ones who lost got quiet. It created enormous wealth and a definition of success narrow enough to strangle a person. So was eighties Wall Street American ambition perfected or greed that finally found good lighting? #usa",
+  "The American talk show put ordinary people on a stage and let a studio audience decide how to feel about them. It called that honesty and sold it as entertainment. Some people found a voice. Most found a spectacle with their name under it. So was the talk show America listening to itself or just watching itself for ratings? #america",
+  "The American high school built a stadium bigger than its library and gave a teenage boy a jacket that said he mattered on Friday nights. For some it was the peak of a whole life at seventeen. For the town it was the one thing everyone showed up for. So was high school football a rite of passage or a small city rehearsing its glory on children? #usa",
+  "The American county fair rolled into town with rides bolted together that morning and prizes no one could win. It smelled like fried everything and ran on nostalgia and diesel. It was the one weekend the whole county stood in the same field. So was the fair a genuine gathering or a traveling illusion America agreed to believe once a year? #america",
+  "America handed its citizens a rectangle of plastic and called it trust with a limit. It let a family live the life they were still paying for. It bought the sofa now and the argument later. So was the credit card freedom from waiting or a very polite way to sell people their own future at interest? #usa",
+  "American television found a preacher, gave him a satellite, and let him ask a nation for money between miracles. Some of the faith was real. Some of the accounting was not. It sold salvation with an 800 number at the bottom of the screen. So was the televangelist a ministry or the first influencer America ever put on the air? #america",
+  "America turned one high school night into a small wedding no one was marrying into. The dress, the car, the photo on the stairs, all of it rehearsing an adulthood that hadn't arrived. For one night teenagers played at being the people they hoped to become. So was prom a celebration or America teaching its kids to perform a milestone before they'd earned one? #usa",
+  "The American motel put a neon sign by the highway that said VACANCY and meant anyone was welcome for a night, no questions after. It was shelter sold by the evening to people passing through or hiding out. It held honeymoons and getaways in the same room. So was the roadside motel the freedom of the open road or just the loneliest light left on in America? #america",
+  "America gave its children a man who could fly and dressed the country's anxieties in a cape. Every hero was a wish and every villain was a fear in a costume. It sold ten cents of hope on a spinner rack. So were superheroes American optimism in print or a nation quietly admitting it was waiting to be saved? #usa",
+  "The American boombox put a whole stereo on a kid's shoulder and turned a sidewalk into a broadcast. It was music as territory, carried loud and on purpose. It gave a neighborhood a sound and gave the adults a headache. So was the boombox self-expression or a teenager's way of taking up space the country hadn't given him? #america",
+  "America put a stranger's advice on a bestseller list and sold millions of people the same secret to a different life. Some of it changed someone. Most got read halfway and shelved. It turned improvement into a product you could finish and still not become. So was the self-help book a map or just America selling the ache and the cure in one paperback? #usa"
+];
+const captionEl=document.getElementById('caption'),cardEl=document.getElementById('card'),counterEl=document.getElementById('counter'),genBtn=document.getElementById('gen'),copyBtn=document.getElementById('copy');
+let bag=[],current="",count=0;
+function refillBag(){bag=CAPTIONS.map((_,i)=>i);for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
+function render(t){captionEl.innerHTML=t.replace(/(#\w+)/g,'<span class="hash">$1</span>');}
+function next(){if(bag.length===0)refillBag();current=CAPTIONS[bag.pop()];count++;counterEl.textContent='#'+String(count).padStart(3,'0');render(current);cardEl.classList.remove('swap');void cardEl.offsetWidth;cardEl.classList.add('swap');resetCopy();}
+function resetCopy(){copyBtn.classList.remove('copied');copyBtn.textContent='Copy';}
+async function copyCurrent(){try{await navigator.clipboard.writeText(current);}catch(e){const ta=document.createElement('textarea');ta.value=current;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(_){}document.body.removeChild(ta);}copyBtn.classList.add('copied');copyBtn.textContent='Copied ✓';setTimeout(resetCopy,1600);}
+genBtn.addEventListener('click',next);
+copyBtn.addEventListener('click',copyCurrent);
+refillBag();next();
+</script>
+</body>
+</html>
