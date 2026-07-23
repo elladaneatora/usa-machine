@@ -38,18 +38,18 @@
 <div class="wrap">
   <header class="brand">
     <h1>USA<span class="flag">·</span>Machine</h1>
-    <span class="tag">always a new one</span>
+    <span class="tag">never the same twice</span>
   </header>
   <div class="card" id="card">
     <div class="quotemark">&ldquo;</div>
-    <p class="caption" id="caption"></p>
-    <div class="meta"><span id="counter">#001</span><span><span class="dot">●</span>&nbsp;made with effect</span></div>
+    <p class="caption" id="caption">Press &ldquo;New caption&rdquo; for your one-of-a-kind caption.</p>
+    <div class="meta"><span id="counter">#—</span><span><span class="dot">●</span>&nbsp;made with effect</span></div>
   </div>
   <div class="controls">
     <button class="btn-gen" id="gen">New caption</button>
     <button class="btn-copy" id="copy">Copy</button>
   </div>
-  <footer class="note">Free · no account. Share the link with your followers.</footer>
+  <footer class="note">Free · no account. Share the link with your team.</footer>
 </div>
 <script>
 const ABSTRACT = [
@@ -128,23 +128,61 @@ const TOPICS = [
   {o:["The American boombox put a whole stereo on a kid's shoulder and turned a sidewalk into a broadcast.","America shrank the stereo down to something a teenager could carry loud through a neighborhood."],m:["It was music as territory, carried loud and on purpose.","It gave a neighborhood a sound and gave the adults a headache.","It ran through batteries almost as fast as it ran through the block."],c:["So was the boombox self-expression or a teenager's way of taking up space the country hadn't given him?","So did the boombox share music or claim a corner of the street with it?"]},
   {o:["America put a stranger's advice on a bestseller list and sold millions the same secret to a different life.","America turned a stranger's advice into a bestseller and sold everyone the same way out."],m:["Some of it changed someone and most got read halfway and shelved.","It turned improvement into a product you could finish and still not become.","The next one was always out before you'd tried the last."],c:["So was the self-help book a map or just America selling the ache and the cure in one paperback?","So did the self-help book offer a way forward or just a well-written reason to keep buying them?"]}
 ];
+
 const captionEl=document.getElementById('caption'),cardEl=document.getElementById('card'),counterEl=document.getElementById('counter'),genBtn=document.getElementById('gen'),copyBtn=document.getElementById('copy');
-let current="",count=0;
-  if(new URLSearchParams(location.search).get('p')){var _g=5,_p=parseInt(new URLSearchParams(location.search).get('p'),10);if(_p>=1&&_p<=_g){for(var _i=TOPICS.length-1;_i>=0;_i--){if(_i%_g!==(_p-1))TOPICS.splice(_i,1);}var _t=document.querySelector('.brand .tag');if(_t)_t.textContent='set '+_p+' of '+_g;}}
-let seen;
-try { seen = new Set(JSON.parse(localStorage.getItem('usa_seen')||'[]')); } catch(e){ seen = new Set(); }
-function remember(s){ seen.add(s); try { const a=[...seen]; if(a.length>5000)a.splice(0,a.length-5000); localStorage.setItem('usa_seen',JSON.stringify(a)); } catch(e){} }
-function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-function pickTwo(a){ let i=Math.floor(Math.random()*a.length),j; do{ j=Math.floor(Math.random()*a.length); }while(j===i); return [a[i],a[j]]; }
-function compose(){ const t=pick(TOPICS); const [a1,a2]=pickTwo(ABSTRACT); const tag=Math.random()<0.5?'#america':'#usa'; return pick(t.o)+' '+pick(t.m)+' '+a1+' '+a2+' '+pick(t.c)+' '+tag; }
-function generate(){ let s,tries=0; do{ s=compose(); tries++; }while(seen.has(s)&&tries<12); remember(s); return s; }
+let current="", busy=false;
+
+// The shared counter server (Cloudflare Worker). Each press gets the next
+// globally-unique number, so no caption is ever handed to two people.
+const API="https://usa-next.theadmirexagency.workers.dev/next";
+
+// Turn a unique number into a unique caption (a bijection over the whole space).
+const PAIRS=ABSTRACT.length*(ABSTRACT.length-1);
+const PER=2*3*2*2*PAIRS;
+const M=TOPICS.length*PER;
+const A=1003001, C=524287;
+function decode(g){
+  const topic=Math.floor(g/PER); let rem=g%PER;
+  const pair=rem%PAIRS; rem=Math.floor(rem/PAIRS);
+  const oi=rem%2; rem=Math.floor(rem/2);
+  const mi=rem%3; rem=Math.floor(rem/3);
+  const ci=rem%2; rem=Math.floor(rem/2);
+  const ti=rem%2;
+  const na=ABSTRACT.length-1;
+  const i=Math.floor(pair/na); const j0=pair%na; const j=j0<i?j0:j0+1;
+  const t=TOPICS[topic];
+  return t.o[oi]+' '+t.m[mi]+' '+ABSTRACT[i]+' '+ABSTRACT[j]+' '+t.c[ci]+' '+(ti?'#usa':'#america');
+}
+function captionFor(n){ return decode((A*(n%M)+C)%M); }
+
 function render(t){ captionEl.innerHTML=t.replace(/(#\w+)/g,'<span class="hash">$1</span>'); }
-function next(){ current=generate(); count++; counterEl.textContent='#'+String(count).padStart(3,'0'); render(current); cardEl.classList.remove('swap'); void cardEl.offsetWidth; cardEl.classList.add('swap'); resetCopy(); }
+function swap(){ cardEl.classList.remove('swap'); void cardEl.offsetWidth; cardEl.classList.add('swap'); }
+async function next(){
+  if(busy) return; busy=true;
+  const label=genBtn.textContent; genBtn.textContent='…';
+  try{
+    const r=await fetch(API,{cache:'no-store'});
+    const d=await r.json();
+    if(typeof d.n!=='number') throw 0;
+    current=captionFor(d.n);
+    counterEl.textContent='#'+String(d.n).padStart(3,'0');
+    render(current); swap();
+  }catch(e){
+    current='';
+    captionEl.textContent='No connection — press New caption again.';
+    counterEl.textContent='#—';
+  }
+  genBtn.textContent=label; busy=false; resetCopy();
+}
 function resetCopy(){ copyBtn.classList.remove('copied'); copyBtn.textContent='Copy'; }
-async function copyCurrent(){ try{ await navigator.clipboard.writeText(current); }catch(e){ const ta=document.createElement('textarea'); ta.value=current; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){} document.body.removeChild(ta); } copyBtn.classList.add('copied'); copyBtn.textContent='Copied ✓'; setTimeout(resetCopy,1600); }
+async function copyCurrent(){
+  if(!current) return;
+  try{ await navigator.clipboard.writeText(current); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=current; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){} document.body.removeChild(ta); }
+  copyBtn.classList.add('copied'); copyBtn.textContent='Copied ✓'; setTimeout(resetCopy,1600);
+}
 genBtn.addEventListener('click',next);
 copyBtn.addEventListener('click',copyCurrent);
-next();
 </script>
 </body>
 </html>
